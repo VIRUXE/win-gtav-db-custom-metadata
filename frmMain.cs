@@ -105,17 +105,17 @@ namespace gtavvehicles
         private void PopulateForm()
         {
             Vehicle v = vehicles[currentVehicle];
-            string model = v.properties[Vehicle.Property.model];
+            string model = v.model;
 
             this.Text = $"GTAV Vehicles - {currentVehicle + 1} / {vehicles.Count} - {model}";
-            cmbKeyType.Text = v.properties[Vehicle.Property.key_type];
-            txtFuelCapacity.Text = v.properties[Vehicle.Property.capacity_fuel];
-            txtOilCapacity.Text = v.properties[Vehicle.Property.capacity_oil];
-            txtRadiatorCapacity.Text = v.properties[Vehicle.Property.capacity_radiator];
-            txtTrunkCapacity.Text = v.properties[Vehicle.Property.capacity_trunk];
-            txtGloveboxCapacity.Text = v.properties[Vehicle.Property.capacity_glovebox];
-            cmbFuelType.Text = v.properties[Vehicle.Property.fuel_type];
-            txtFactoryPrice.Text = v.properties[Vehicle.Property.factory_price];
+            cmbKeyType.Text = v.key_type;
+            txtFuelCapacity.Text = v.capacity_fuel;
+            txtOilCapacity.Text = v.capacity_oil;
+            txtRadiatorCapacity.Text = v.capacity_radiator;
+            txtTrunkCapacity.Text = v.capacity_trunk;
+            txtGloveboxCapacity.Text = v.capacity_glovebox;
+            cmbFuelType.Text = v.fuel_type;
+            txtFactoryPrice.Text = v.factory_price;
             
             // Try to load up the image we go from the database
             try
@@ -149,14 +149,14 @@ namespace gtavvehicles
 
             Vehicle v = vehicles[currentVehicle];
             // Don't do anything if the form values are the same as the database values
-            if (cmbKeyType.Text == v.properties[Vehicle.Property.key_type] &&
-                txtFuelCapacity.Text == v.properties[Vehicle.Property.capacity_fuel] &&
-                txtOilCapacity.Text == v.properties[Vehicle.Property.capacity_oil] &&
-                txtRadiatorCapacity.Text == v.properties[Vehicle.Property.capacity_radiator] &&
-                txtTrunkCapacity.Text == v.properties[Vehicle.Property.capacity_trunk] &&
-                txtGloveboxCapacity.Text == v.properties[Vehicle.Property.capacity_glovebox] &&
-                cmbFuelType.Text == v.properties[Vehicle.Property.fuel_type] &&
-                txtFactoryPrice.Text == v.properties[Vehicle.Property.factory_price])
+            if (cmbKeyType.Text == v.key_type &&
+                txtFuelCapacity.Text == v.capacity_fuel &&
+                txtOilCapacity.Text == v.capacity_oil &&
+                txtRadiatorCapacity.Text == v.capacity_radiator &&
+                txtTrunkCapacity.Text == v.capacity_trunk &&
+                txtGloveboxCapacity.Text == v.capacity_glovebox &&
+                cmbFuelType.Text == v.fuel_type &&
+                txtFactoryPrice.Text == v.factory_price)
                 return;
 
             // Build the query string with the text from the form
@@ -170,7 +170,7 @@ namespace gtavvehicles
                            $"capacity_glovebox = {(txtGloveboxCapacity.Text.ToLower() == "null" ? "NULL" : $"'{txtGloveboxCapacity.Text}'")}, " +
                            $"fuel_type = {(cmbFuelType.Text.ToLower() == "null" ? "NULL" : $"'{cmbFuelType.Text}'")}, " +
                            $"factory_price = {(txtFactoryPrice.Text.ToLower() == "null" ? "NULL" : $"'{txtFactoryPrice.Text}'")} " +
-                           $"WHERE model = '{v.properties[Vehicle.Property.model]}';";
+                           $"WHERE model = '{v.model}';";
             MySqlCommand cmd = new(query, db);
 
             // Execute the query and show a message box with the result
@@ -179,14 +179,14 @@ namespace gtavvehicles
                 if (cmd.ExecuteNonQuery() > 0)
                 {
                     // Update the vehicle object with the new values
-                    v.properties[Vehicle.Property.key_type] = cmbKeyType.Text;
-                    v.properties[Vehicle.Property.capacity_fuel] = txtFuelCapacity.Text;
-                    v.properties[Vehicle.Property.capacity_oil] = txtOilCapacity.Text;
-                    v.properties[Vehicle.Property.capacity_radiator] = txtRadiatorCapacity.Text;
-                    v.properties[Vehicle.Property.capacity_trunk] = txtTrunkCapacity.Text;
-                    v.properties[Vehicle.Property.capacity_glovebox] = txtGloveboxCapacity.Text;
-                    v.properties[Vehicle.Property.fuel_type] = cmbFuelType.Text;
-                    v.properties[Vehicle.Property.factory_price] = txtFactoryPrice.Text;
+                    v.key_type = cmbKeyType.Text;
+                    v.capacity_fuel = txtFuelCapacity.Text;
+                    v.capacity_oil = txtOilCapacity.Text;
+                    v.capacity_radiator = txtRadiatorCapacity.Text;
+                    v.capacity_trunk = txtTrunkCapacity.Text;
+                    v.capacity_glovebox = txtGloveboxCapacity.Text;
+                    v.fuel_type = cmbFuelType.Text;
+                    v.factory_price = txtFactoryPrice.Text;
 
                     btnNext_Click(null, null);
                 }

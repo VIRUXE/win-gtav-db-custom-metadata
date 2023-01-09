@@ -8,32 +8,29 @@ namespace gtavvehicles
 {
     internal class Vehicle
     {
-        public enum Property
-        {
-            model,
-            key_type,
-            capacity_fuel,
-            capacity_oil,
-            capacity_radiator,
-            capacity_trunk,
-            capacity_glovebox,
-            fuel_type,
-            factory_price
-        }
-
-        public Dictionary<Property, string> properties = new();
+        // The database doesn't care if the values are a string or an int so we'll just use strings
+        
+        public string model { get; set; }
+        public string key_type { get; set; }
+        public string capacity_fuel { get; set; }
+        public string capacity_oil { get; set; }
+        public string capacity_radiator { get; set; }
+        public string capacity_trunk { get; set; }
+        public string capacity_glovebox { get; set; }
+        public string fuel_type { get; set; }
+        public string factory_price { get; set; }
 
         public Vehicle(string[] data)
         {
-            properties.Add(Property.model, data[0]);
-            properties.Add(Property.key_type, data[1]);
-            properties.Add(Property.capacity_fuel, data[2]);
-            properties.Add(Property.capacity_oil, data[3]);
-            properties.Add(Property.capacity_radiator, data[4]);
-            properties.Add(Property.capacity_trunk, data[5]);
-            properties.Add(Property.capacity_glovebox, data[6]);
-            properties.Add(Property.fuel_type, data[7]);
-            properties.Add(Property.factory_price, data[9]);
+            this.model = data[0];
+            this.key_type = data[1];
+            this.capacity_fuel = data[2];
+            this.capacity_oil = data[3];
+            this.capacity_radiator = data[4];
+            this.capacity_trunk = data[5];
+            this.capacity_glovebox = data[6];
+            this.fuel_type = data[7];
+            this.factory_price = data[9];
         }
     }
 }
