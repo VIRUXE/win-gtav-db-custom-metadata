@@ -59,13 +59,15 @@ namespace gtavvehicles
 
                 // Close the reader
                 reader.Close();
+
+                db.Close();
             }
         }
 
         private void frmMain_Load(object sender, EventArgs e)
         {
             // Close the app if there's no connection to the database
-            if (db.State != ConnectionState.Open)
+            if (vehicles.Count == 0)
             {
                 Application.Exit();
                 return; // ? Is this needed?
@@ -137,12 +139,14 @@ namespace gtavvehicles
                 pctVehicle.Image = null;
             }
 
-            // If the current vehicle was saved to the database, the button would be disabled, so enable it
-            if (btnSave.Enabled == false) btnSave.Enabled = true;
+            cmbKeyType.Focus();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            // Open the database connection
+            if (db.State != ConnectionState.Open) db.Open();
+
             Vehicle v = vehicles[currentVehicle];
             // Don't do anything if the form values are the same as the database values
             if (cmbKeyType.Text == v.properties[Vehicle.Property.key_type] &&
@@ -158,14 +162,14 @@ namespace gtavvehicles
             // Build the query string with the text from the form
             // We need to make sure that if any value is NULL we don't put apostrophes around it
             string query = $"UPDATE vehicles_metadata_custom SET " +
-                           $"key_type = {(cmbKeyType.Text == "NULL" ? "NULL" : $"'{cmbKeyType.Text}'")}, " +
-                           $"capacity_fuel = {(txtFuelCapacity.Text == "NULL" ? "NULL" : $"'{txtFuelCapacity.Text}'")}, " +
-                           $"capacity_oil = {(txtOilCapacity.Text == "NULL" ? "NULL" : $"'{txtOilCapacity.Text}'")}, " +
-                           $"capacity_radiator = {(txtRadiatorCapacity.Text == "NULL" ? "NULL" : $"'{txtRadiatorCapacity.Text}'")}, " +
-                           $"capacity_trunk = {(txtTrunkCapacity.Text == "NULL" ? "NULL" : $"'{txtTrunkCapacity.Text}'")}, " +
-                           $"capacity_glovebox = {(txtGloveboxCapacity.Text == "NULL" ? "NULL" : $"'{txtGloveboxCapacity.Text}'")}, " +
-                           $"fuel_type = {(cmbFuelType.Text == "NULL" ? "NULL" : $"'{cmbFuelType.Text}'")}, " +
-                           $"factory_price = {(txtFactoryPrice.Text == "NULL" ? "NULL" : $"'{txtFactoryPrice.Text}'")} " +
+                           $"key_type = {(cmbKeyType.Text.ToLower() == "null" ? "NULL" : $"'{cmbKeyType.Text}'")}, " +
+                           $"capacity_fuel = {(txtFuelCapacity.Text.ToLower() == "null" ? "NULL" : $"'{txtFuelCapacity.Text}'")}, " +
+                           $"capacity_oil = {(txtOilCapacity.Text.ToLower() == "null" ? "NULL" : $"'{txtOilCapacity.Text}'")}, " +
+                           $"capacity_radiator = {(txtRadiatorCapacity.Text.ToLower() == "null" ? "NULL" : $"'{txtRadiatorCapacity.Text}'")}, " +
+                           $"capacity_trunk = {(txtTrunkCapacity.Text.ToLower() == "null" ? "NULL" : $"'{txtTrunkCapacity.Text}'")}, " +
+                           $"capacity_glovebox = {(txtGloveboxCapacity.Text.ToLower() == "null" ? "NULL" : $"'{txtGloveboxCapacity.Text}'")}, " +
+                           $"fuel_type = {(cmbFuelType.Text.ToLower() == "null" ? "NULL" : $"'{cmbFuelType.Text}'")}, " +
+                           $"factory_price = {(txtFactoryPrice.Text.ToLower() == "null" ? "NULL" : $"'{txtFactoryPrice.Text}'")} " +
                            $"WHERE model = '{v.properties[Vehicle.Property.model]}';";
             MySqlCommand cmd = new(query, db);
 
@@ -184,9 +188,7 @@ namespace gtavvehicles
                     v.properties[Vehicle.Property.fuel_type] = cmbFuelType.Text;
                     v.properties[Vehicle.Property.factory_price] = txtFactoryPrice.Text;
 
-                    btnSave.Enabled = false;
-                    // Focus on the next button
-                    btnNext.Focus();
+                    btnNext_Click(null, null);
                 }
                 else
                     MessageBox.Show("Não foi possível guardar os dados!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -195,6 +197,9 @@ namespace gtavvehicles
             {
                 MessageBox.Show($"Ocorreu um erro ao guardar os dados:\n\n{ex.Message}\n\nConsulta: {query}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            // Close the database connection
+            if (db.State != ConnectionState.Closed) db.Close();
         }
 
         private void btnReset_Click(object sender, EventArgs e)
