@@ -1,13 +1,14 @@
 ﻿using MySqlConnector;
+using System.Data;
 
 namespace gtavvehicles
 {
     public partial class frmMain : Form
     {
         public static MySqlConnection db = new();
-        private static List<Vehicle> vehicles = new();
+        private List<Vehicle> vehicles = new();
         private int currentVehicle = 0;
-        private static Dictionary<string, string> vehicleImages = new();
+        private Dictionary<string, string> vehicleImages = new();
 
         public frmMain()
         {
@@ -16,15 +17,12 @@ namespace gtavvehicles
             ConnectionCredentials cc = new();
 
             // If the dialog doesn't come back as OK then close the application
-            if (cc.ShowDialog() != DialogResult.OK)
+            if (cc.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("You must enter a valid username and password to continue", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
-            }
-            else
-            {
+                // We need to get the vehicles that either have 0 or NULL in their columns.
+                // Columns: key_type, capacity_fuel, capacity_oil, capacity_radiator, capacity_trunk, capacity_glovebox, fuel_type and factory_price
                 // Execute a query to get all the vehicles that need to be edited
-                MySqlCommand cmd = new("SELECT * FROM vehicles_metadata_custom WHERE fuel_type IS NULL;", db);
+                MySqlCommand cmd = new("SELECT * FROM vehicles_metadata_custom WHERE key_type = 0 OR key_type IS NULL OR capacity_fuel = 0 OR capacity_fuel IS NULL OR capacity_oil = 0 OR capacity_oil IS NULL OR capacity_radiator = 0 OR capacity_radiator IS NULL OR capacity_trunk = 0 OR capacity_trunk IS NULL OR capacity_glovebox = 0 OR capacity_glovebox IS NULL OR fuel_type = 0 OR fuel_type IS NULL OR factory_price = 0 OR factory_price IS NULL", db);
                 MySqlDataReader reader = cmd.ExecuteReader();
                 
                 // Add each vehicle to the list
@@ -66,6 +64,13 @@ namespace gtavvehicles
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            // Close the app if there's no connection to the database
+            if (db.State != ConnectionState.Open)
+            {
+                Application.Exit();
+                return; // ? Is this needed?
+            }
+
             // Load the first vehicle in the list
             PopulateForm();
         }
@@ -73,8 +78,8 @@ namespace gtavvehicles
         // Application Close
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            // Close the database connection
-            db.Close();
+            // Close the database connection if it's open
+            if (db.State == ConnectionState.Open) db.Close();
         }
 
         private void btnPrevious_Click(object sender, EventArgs e)
